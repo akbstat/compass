@@ -1,0 +1,44 @@
+[package]
+name = "compass"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "compass"
+path = "bin/compass/server/main.rs"
+
+[workspace]
+members = ["crates/apis", "crates/vestige"]
+
+[dependencies]
+utoipa = { workspace = true }
+vestige = { path = "crates/vestige" }
+apis = { path = "crates/apis" }
+dotenv = { workspace = true }
+axum = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-appender = "0.2.3"
+tracing-subscriber = { version = "0.3.19", features = ["json"] }
+tower-http = { version = "0.6.2", features = ["trace"] }
+thiserror = { workspace = true }
+utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
+utoipa-axum = { version = "0.2.0", features = ["debug"] }
+sqlx = { workspace = true }
+
+[workspace.dependencies]
+utoipa = { version = "5.3.1", features = ["axum_extras", "debug"] }
+thiserror = "2.0.12"
+axum = "0.8.3"
+dotenv = "0.15.0"
+serde = { version = "1.0.219", features = ["derive"] }
+sqlx = { version = "0.8.5", features = [
+    "postgres",
+    "runtime-tokio",
+    "tls-native-tls",
+    "chrono",
+] }
+tokio = { version = "1.44.2", features = ["full"] }
+tower-http = { version = "0.6.2", features = ["trace"] }
+tracing = "0.1.41"
+chrono = { version = "0.4.41", features = ["serde"] }
