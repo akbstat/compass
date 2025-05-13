@@ -8,7 +8,7 @@ name = "compass"
 path = "bin/compass/server/main.rs"
 
 [workspace]
-members = ["crates/apis", "crates/vestige"]
+members = ["crates/apis", "crates/sdtm", "crates/vestige"]
 
 [dependencies]
 utoipa = { workspace = true }
