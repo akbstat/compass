@@ -2,4 +2,4 @@ mod errors;
 mod repository;
 mod usecase;
 
-pub use usecase::MetadataUsecase;
+pub use usecase::{MetadataUsecase, RawdataUsecase};

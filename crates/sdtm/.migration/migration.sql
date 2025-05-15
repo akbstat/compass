@@ -135,3 +135,118 @@ FROM sdtm_variable
     INNER JOIN variable_type ON sdtm_variable.variable_type_id = variable_type.id
     INNER JOIN variable_role ON sdtm_variable.variable_role_id = variable_role.id
     INNER JOIN variable_core ON sdtm_variable.variable_core_id = variable_core.id;
+-- define table project
+CREATE TABLE IF NOT EXISTS project (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(20) UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+COMMENT ON COLUMN project.name IS 'Project Name';
+-- binding function update_timestamp
+CREATE OR REPLACE TRIGGER project_update BEFORE
+UPDATE ON project FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+-- define table project_version
+CREATE TABLE IF NOT EXISTS project_version (
+    id SERIAL PRIMARY KEY,
+    project_id INTEGER NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+COMMENT ON COLUMN project_version.project_id IS 'Project ID';
+COMMENT ON COLUMN project_version.name IS 'Project Version Name';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_project_version ON project_version (project_id, name);
+-- binding function update_timestamp
+CREATE OR REPLACE TRIGGER project_version_update BEFORE
+UPDATE ON project_version FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+-- define table form
+CREATE TABLE IF NOT EXISTS form (
+    id SERIAL PRIMARY KEY,
+    version_id INTEGER NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    description VARCHAR(200) NOT NULL,
+    form_order INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+COMMENT ON COLUMN form.version_id IS 'Project Version ID';
+COMMENT ON COLUMN form.name IS 'Form Name';
+COMMENT ON COLUMN form.description IS 'Form Description';
+COMMENT ON COLUMN form.form_order IS 'Form Display Order';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_form ON form (version_id, name);
+-- binding function update_timestamp
+CREATE OR REPLACE TRIGGER form_update BEFORE
+UPDATE on form FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+-- define table item
+CREATE TABLE IF NOT EXISTS item (
+    id SERIAL PRIMARY KEY,
+    form_id INTEGER NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    label VARCHAR(200) NOT NULL,
+    item_type_id INTEGER NOT NULL,
+    item_order INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+COMMENT ON COLUMN item.form_id IS 'Form ID';
+COMMENT ON COLUMN item.name IS 'Item Name';
+COMMENT ON COLUMN item.label IS 'Item Label';
+COMMENT ON COLUMN item.item_type_id IS 'Item Type ID';
+COMMENT ON COLUMN item.item_order IS 'Item Display Order';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_item ON item (form_id, name);
+-- binding function update_timestamp
+CREATE OR REPLACE TRIGGER item_update BEFORE
+UPDATE on item FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+-- define table item_type
+CREATE TABLE IF NOT EXISTS item_type (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(30) UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+COMMENT ON COLUMN item_type.name IS 'Item Type Name';
+-- binding function update_timestamp
+CREATE OR REPLACE TRIGGER item_type_update BEFORE
+UPDATE on item_type FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+-- define table item_option
+CREATE TABLE IF NOT EXISTS item_option (
+    id SERIAL PRIMARY KEY,
+    item_id INTEGER NOT NULL,
+    option_value VARCHAR(200) NOT NULL,
+    option_display VARCHAR(200) NOT NULL,
+    option_order INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+COMMENT ON COLUMN item_option.item_id IS 'Item ID';
+COMMENT ON COLUMN item_option.option_value IS 'Option Actual Value';
+COMMENT ON COLUMN item_option.option_display IS 'Option Display Value';
+COMMENT ON COLUMN item_option.option_order IS 'Option Display Order';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_item_option ON item_option (item_id, option_value);
+-- binding function update_timestamp
+CREATE OR REPLACE TRIGGER item_option_update BEFORE
+UPDATE on item_option FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+-- define table item_unit
+CREATE TABLE IF NOT EXISTS item_unit (
+    id SERIAL PRIMARY KEY,
+    item_id INTEGER NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    unit_order INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+COMMENT ON COLUMN item_unit.item_id IS 'Item ID';
+COMMENT ON COLUMN item_unit.name IS 'Unit Name';
+COMMENT ON COLUMN item_unit.unit_order IS 'Unit Display Order';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_item_unit ON item_unit (item_id, name);
+-- binding function update_timestamp
+CREATE OR REPLACE TRIGGER item_unit_update BEFORE
+UPDATE on item_unit FOR EACH ROW EXECUTE FUNCTION update_timestamp();
