@@ -233,6 +233,7 @@ dependencies = [
  "apis",
  "axum",
  "dotenv",
+ "sdtm",
  "sqlx",
  "thiserror 2.0.12",
  "tokio",

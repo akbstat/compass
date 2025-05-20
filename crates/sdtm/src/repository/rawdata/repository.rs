@@ -8,6 +8,7 @@ use apis::sdtm::rawdata::{
 use sqlx::PgPool;
 use std::sync::Arc;
 
+#[derive(Clone)]
 pub struct RawdataRepository {
     pool: Arc<PgPool>,
 }
@@ -15,6 +16,34 @@ pub struct RawdataRepository {
 impl RawdataRepository {
     pub fn new(pool: Arc<PgPool>) -> RawdataRepository {
         RawdataRepository { pool }
+    }
+
+    pub async fn find_one_project(&self, project: &str) -> Result<Option<ProjectRow>> {
+        let row: Option<ProjectRow> = sqlx::query_as(
+            r#"
+SELECT id, name
+FROM project
+WHERE name = $1        
+        "#,
+        )
+        .bind(project)
+        .fetch_optional(self.pool.as_ref())
+        .await?;
+        Ok(row)
+    }
+
+    pub async fn list_project_versions(&self, project_id: i32) -> Result<Vec<ProjectVersionRow>> {
+        let rows: Vec<ProjectVersionRow> = sqlx::query_as(
+            r#"
+SELECT id, name
+FROM project_version
+WHERE project_id = $1
+        "#,
+        )
+        .bind(project_id)
+        .fetch_all(self.pool.as_ref())
+        .await?;
+        Ok(rows)
     }
 
     pub async fn list_forms(&self, version_id: i32) -> Result<Vec<FormRow>> {
