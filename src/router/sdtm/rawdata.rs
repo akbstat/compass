@@ -19,6 +19,7 @@ pub fn router(usecase: RawdataUsecase) -> OpenApiRouter {
         .routes(routes!(list_forms, create_form))
         .routes(routes!(list_items, create_item))
         .routes(routes!(list_item_types, create_item_type))
+        .routes(routes!(create_item_type))
         .routes(routes!(create_item_option))
         .routes(routes!(create_item_unit))
         .with_state(usecase)

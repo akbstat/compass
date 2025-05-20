@@ -29,6 +29,11 @@ pub async fn init_router(config: &Config) -> Result<Router> {
         .nest("/api/sdtm/rawdata", sdtm::rawdata::router(sdtm_rawdata_uc))
         .layer(TraceLayer::new_for_http())
         .layer(from_fn(compass_user_middleware))
+        .nest(
+            "/api/sdtm/metadata",
+            sdtm::metadata::router(sdtm_metadata_uc),
+        )
+        .nest("/api/sdtm/rawdata", sdtm::rawdata::router(sdtm_rawdata_uc))
         .split_for_parts();
     let router = router
         .merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api))
