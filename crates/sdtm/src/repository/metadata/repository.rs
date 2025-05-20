@@ -7,6 +7,7 @@ use apis::sdtm::metadata::{CreateSdtmDomainRequest, CreateSdtmVariableRequest};
 use sqlx::PgPool;
 use std::sync::Arc;
 
+#[derive(Clone)]
 pub struct MetadataRepository {
     pool: Arc<PgPool>,
 }

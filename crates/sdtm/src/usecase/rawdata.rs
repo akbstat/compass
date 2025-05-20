@@ -2,12 +2,13 @@ use crate::{errors::Result, repository::RawdataRepository};
 use apis::sdtm::rawdata::{
     CreateFormRequest, CreateItemOptionRequest, CreateItemRequest, CreateItemTypeRequest,
     CreateItemUnitRequest, CreateProjectRequest, CreateProjectVersionRequest, Form, Item,
-    ItemDetail, ItemOption, ItemType, ItemUnit, ListFormsRequest, ListItemsRequest, Project,
-    ProjectVersion,
+    ItemDetail, ItemOption, ItemType, ItemUnit, ListFormsRequest, ListItemsRequest,
+    ListProjectVersionRequest, Project, ProjectVersion,
 };
 use sqlx::PgPool;
 use std::{collections::HashMap, sync::Arc};
 
+#[derive(Clone)]
 pub struct RawdataUsecase {
     repo: RawdataRepository,
 }
@@ -16,6 +17,31 @@ impl RawdataUsecase {
     pub fn new(pool: Arc<PgPool>) -> RawdataUsecase {
         let repo = RawdataRepository::new(pool);
         RawdataUsecase { repo }
+    }
+
+    pub async fn list_project_versions(
+        &self,
+        request: &ListProjectVersionRequest,
+    ) -> Result<(i32, Vec<ProjectVersion>)> {
+        let project_name = format!("{}-{}", request.product, request.trial);
+        let project = self.repo.find_one_project(&project_name).await?;
+        match project {
+            Some(project) => Ok((
+                project.id,
+                self.repo
+                    .list_project_versions(project.id)
+                    .await?
+                    .into_iter()
+                    .map(Into::into)
+                    .collect(),
+            )),
+            None => {
+                let project = self
+                    .create_project(&CreateProjectRequest { name: project_name })
+                    .await?;
+                Ok((project.id, vec![]))
+            }
+        }
     }
 
     pub async fn list_forms(&self, request: &ListFormsRequest) -> Result<Vec<Form>> {
@@ -85,7 +111,7 @@ impl RawdataUsecase {
             .collect())
     }
 
-    pub async fn create_project(&self, request: &CreateProjectRequest) -> Result<Project> {
+    async fn create_project(&self, request: &CreateProjectRequest) -> Result<Project> {
         let project = self.repo.create_project(&request.name).await?;
         Ok(project.into())
     }

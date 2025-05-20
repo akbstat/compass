@@ -1,7 +1,7 @@
 use apis::sdtm::rawdata::{
     CreateFormRequest, CreateItemOptionRequest, CreateItemRequest, CreateItemTypeRequest,
-    CreateItemUnitRequest, CreateProjectRequest, CreateProjectVersionRequest, ListFormsRequest,
-    ListItemsRequest,
+    CreateItemUnitRequest, CreateProjectVersionRequest, ListFormsRequest, ListItemsRequest,
+    ListProjectVersionRequest,
 };
 use dotenv::dotenv;
 use sdtm::RawdataUsecase;
@@ -16,14 +16,17 @@ async fn rawdata_integration_test() -> Result<(), Box<dyn Error>> {
     let pool = Arc::new(PgPool::connect(&database_url).await?);
     let uc = RawdataUsecase::new(Arc::clone(&pool));
 
-    let create_project_request = CreateProjectRequest {
-        name: "akxxx-yyy".into(),
+    let list_project_versions_request = ListProjectVersionRequest {
+        product: "akxxx".into(),
+        trial: "yyy".into(),
     };
-    let project = uc.create_project(&create_project_request).await?;
-    assert_eq!(create_project_request.name, project.name);
+    let (project_id, project_version_list) = uc
+        .list_project_versions(&list_project_versions_request)
+        .await?;
+    assert_eq!(project_version_list.len(), 0);
 
     let create_project_version_request = CreateProjectVersionRequest {
-        project_id: project.id,
+        project_id,
         name: "v0.1".into(),
     };
     let project_version = uc

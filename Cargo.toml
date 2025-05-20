@@ -12,7 +12,6 @@ members = ["crates/apis", "crates/sdtm", "crates/vestige"]
 
 [dependencies]
 utoipa = { workspace = true }
-vestige = { path = "crates/vestige" }
 apis = { path = "crates/apis" }
 dotenv = { workspace = true }
 axum = { workspace = true }
@@ -25,6 +24,8 @@ thiserror = { workspace = true }
 utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
 utoipa-axum = { version = "0.2.0", features = ["debug"] }
 sqlx = { workspace = true }
+vestige = { path = "crates/vestige" }
+sdtm = {path = "crates/sdtm"}
 
 [workspace.dependencies]
 utoipa = { version = "5.3.1", features = ["axum_extras", "debug"] }

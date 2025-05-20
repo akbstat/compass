@@ -11,6 +11,8 @@ pub enum Errors {
     ConifgError(#[from] env::VarError),
     #[error("error from vestige: {0}")]
     VestigeError(#[from] vestige::Errors),
+    #[error("error from sdtm: {0}")]
+    SdtmError(#[from] sdtm::Errors),
     #[error("error from database: {0}")]
     DatabaseError(#[from] sqlx::Error),
     #[error("Unknown Error")]
@@ -22,7 +24,7 @@ impl IntoResponse for Errors {
         let (status, error_message) = match self {
             _ => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "Unknown Internal Server Error",
+                format!("Internal Server Error: {}", self),
             ),
         };
         (status, error_message).into_response()
