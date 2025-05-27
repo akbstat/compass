@@ -73,6 +73,8 @@ pub struct ItemRow {
     pub name: String,
     pub label: String,
     pub item_type_id: i32,
+    pub item_default_value: String,
+    pub item_repeat_index: i32,
     pub item_order: i32,
 }
 
@@ -84,6 +86,8 @@ impl Into<Item> for ItemRow {
             label: self.label,
             item_type_id: self.item_type_id,
             item_order: self.item_order,
+            item_defualt_value: self.item_default_value,
+            item_repeat_index: self.item_repeat_index,
         }
     }
 }

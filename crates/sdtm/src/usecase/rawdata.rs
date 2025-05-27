@@ -54,7 +54,11 @@ impl RawdataUsecase {
         let item_ids = items.iter().map(|item| item.id).collect::<Vec<i32>>();
         let option_map = self.list_item_options(&item_ids).await?;
         let unit_map = self.list_item_units(&item_ids).await?;
-        let type_map = self.list_item_type().await?;
+        let item_types = self.list_item_types().await?;
+        let type_map = item_types
+            .into_iter()
+            .map(|item_type| (item_type.id, item_type))
+            .collect::<HashMap<i32, ItemType>>();
         Ok(items
             .into_iter()
             .map(|item| ItemDetail {
@@ -65,6 +69,8 @@ impl RawdataUsecase {
                 item_option: option_map.get(&item.id).cloned(),
                 item_unit: unit_map.get(&item.id).cloned(),
                 item_order: item.item_order,
+                item_defualt_value: item.item_default_value,
+                item_repeat_index: item.item_repeat_index,
             })
             .collect())
     }
@@ -103,12 +109,9 @@ impl RawdataUsecase {
         Ok(unit_map)
     }
 
-    async fn list_item_type(&self) -> Result<HashMap<i32, ItemType>> {
+    pub async fn list_item_types(&self) -> Result<Vec<ItemType>> {
         let unit = self.repo.list_item_types().await?;
-        Ok(unit
-            .into_iter()
-            .map(|item_type| (item_type.id, item_type.into()))
-            .collect())
+        Ok(unit.into_iter().map(|item_type| item_type.into()).collect())
     }
 
     async fn create_project(&self, request: &CreateProjectRequest) -> Result<Project> {

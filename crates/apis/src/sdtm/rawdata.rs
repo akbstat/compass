@@ -92,6 +92,11 @@ pub struct CreateItemTypeReply {
 }
 
 #[derive(Debug, Serialize, ToSchema)]
+pub struct ListItemTypesReply {
+    pub data: Vec<ItemType>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     pub id: i32,
@@ -99,6 +104,8 @@ pub struct Item {
     pub label: String,
     pub item_type_id: i32,
     pub item_order: i32,
+    pub item_defualt_value: String,
+    pub item_repeat_index: i32,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -111,6 +118,8 @@ pub struct ItemDetail {
     pub item_option: Option<Vec<ItemOption>>,
     pub item_unit: Option<Vec<ItemUnit>>,
     pub item_order: i32,
+    pub item_defualt_value: String,
+    pub item_repeat_index: i32,
 }
 
 #[derive(Debug, Deserialize, IntoParams)]
@@ -132,6 +141,8 @@ pub struct CreateItemRequest {
     pub label: String,
     pub item_type_id: i32,
     pub item_order: i32,
+    pub item_defualt_value: String,
+    pub item_repeat_index: i32,
 }
 
 #[derive(Debug, Serialize, ToSchema)]

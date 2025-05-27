@@ -30,6 +30,8 @@ pub async fn init_router(config: &Config) -> Result<Router> {
         )
         .nest("/api/sdtm/rawdata", sdtm::rawdata::router(sdtm_rawdata_uc))
         .split_for_parts();
-    let router = router.merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api));
+    let router = router
+        .merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api))
+        .layer(TraceLayer::new_for_http());
     Ok(router)
 }

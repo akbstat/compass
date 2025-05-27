@@ -64,10 +64,10 @@ ORDER BY form_order
     pub async fn list_items(&self, form_id: i32) -> Result<Vec<ItemRow>> {
         let rows = sqlx::query_as(
             r#"
-SELECT id, form_id, name, label, item_type_id, item_order
+SELECT id, form_id, name, label, item_type_id, item_order, item_repeat_index, item_default_value
 FROM item
 WHERE form_id = $1
-ORDER BY item_order
+ORDER BY item_order, item_repeat_index
         "#,
         )
         .bind(form_id)
@@ -183,8 +183,8 @@ RETURNING id, name
     pub async fn create_item(&self, request: &CreateItemRequest) -> Result<ItemRow> {
         let row: ItemRow = sqlx::query_as(
             r#"
-INSERT INTO item (form_id, name, label, item_type_id, item_order) VALUES ($1, $2, $3, $4, $5)
-RETURNING id, form_id, name, label, item_type_id, item_order
+INSERT INTO item (form_id, name, label, item_type_id, item_order, item_repeat_index, item_default_value) VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING id, form_id, name, label, item_type_id, item_order, item_repeat_index, item_default_value
         "#,
         )
         .bind(request.form_id)
@@ -192,6 +192,8 @@ RETURNING id, form_id, name, label, item_type_id, item_order
         .bind(&request.label)
         .bind(request.item_type_id)
         .bind(request.item_order)
+        .bind(request.item_repeat_index)
+        .bind(&request.item_defualt_value)
         .fetch_one(self.pool.as_ref())
         .await?;
         Ok(row)

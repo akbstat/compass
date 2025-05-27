@@ -49,12 +49,18 @@ async fn rawdata_integration_test() -> Result<(), Box<dyn Error>> {
     let item_type = uc.create_item_type(&create_item_type_request).await?;
     assert_eq!(item_type.name, create_item_type_request.name);
 
+    let item_types = uc.list_item_types().await?;
+    assert_eq!(item_types.len(), 1);
+    assert_eq!(item_types.first().unwrap().name, item_type.name);
+
     let create_item_request = CreateItemRequest {
         form_id: form.id,
         name: "AEYN".into(),
         label: "Adverse event happend?".into(),
         item_type_id: item_type.id,
         item_order: 0,
+        item_defualt_value: "".into(),
+        item_repeat_index: 0,
     };
     let item = uc.create_item(&create_item_request).await?;
     assert_eq!(item.name, create_item_request.name);

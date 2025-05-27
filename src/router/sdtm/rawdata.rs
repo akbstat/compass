@@ -3,8 +3,8 @@ use apis::sdtm::rawdata::{
     CreateFormReply, CreateFormRequest, CreateItemOptionReply, CreateItemOptionRequest,
     CreateItemReply, CreateItemRequest, CreateItemTypeReply, CreateItemTypeRequest,
     CreateItemUnitReply, CreateItemUnitRequest, CreateProjectVersionReply,
-    CreateProjectVersionRequest, ListFormsReply, ListFormsRequest, ListItemsReply,
-    ListItemsRequest, ListProjectVersionReply, ListProjectVersionRequest,
+    CreateProjectVersionRequest, ListFormsReply, ListFormsRequest, ListItemTypesReply,
+    ListItemsReply, ListItemsRequest, ListProjectVersionReply, ListProjectVersionRequest,
 };
 use axum::{
     extract::{Query, State},
@@ -18,7 +18,7 @@ pub fn router(usecase: RawdataUsecase) -> OpenApiRouter {
         .routes(routes!(list_project_versions, create_project_version))
         .routes(routes!(list_forms, create_form))
         .routes(routes!(list_items, create_item))
-        .routes(routes!(create_item_type))
+        .routes(routes!(list_item_types, create_item_type))
         .routes(routes!(create_item_option))
         .routes(routes!(create_item_unit))
         .with_state(usecase)
@@ -67,6 +67,17 @@ async fn list_items(
 ) -> Result<Json<ListItemsReply>> {
     let data = uc.list_items(&request).await?;
     Ok(Json(ListItemsReply { data }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/item/type",
+    responses((status = OK, body = ListItemTypesReply)),
+    tag = SDTM_RAWDATA_TAG
+)]
+async fn list_item_types(State(uc): State<RawdataUsecase>) -> Result<Json<ListItemTypesReply>> {
+    let data = uc.list_item_types().await?;
+    Ok(Json(ListItemTypesReply { data }))
 }
 
 #[utoipa::path(
