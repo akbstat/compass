@@ -186,9 +186,11 @@ CREATE TABLE IF NOT EXISTS item (
     id SERIAL PRIMARY KEY,
     form_id INTEGER NOT NULL,
     name VARCHAR(20) NOT NULL,
-    label VARCHAR(200) NOT NULL,
+    label VARCHAR(1000) NOT NULL,
     item_type_id INTEGER NOT NULL,
     item_order INTEGER NOT NULL,
+    item_repeat_index INTEGER NOT NULL,
+    item_default_value VARCHAR(1000) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
@@ -198,7 +200,9 @@ COMMENT ON COLUMN item.name IS 'Item Name';
 COMMENT ON COLUMN item.label IS 'Item Label';
 COMMENT ON COLUMN item.item_type_id IS 'Item Type ID';
 COMMENT ON COLUMN item.item_order IS 'Item Display Order';
-CREATE UNIQUE INDEX IF NOT EXISTS idx_item ON item (form_id, name);
+COMMENT ON COLUMN item.item_repeat_index IS 'Item Repeat index in Logline';
+COMMENT ON COLUMN item.item_default_value IS 'Item Default Value in Logline';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_item ON item (form_id, name, item_repeat_index);
 -- binding function update_timestamp
 CREATE OR REPLACE TRIGGER item_update BEFORE
 UPDATE on item FOR EACH ROW EXECUTE FUNCTION update_timestamp();
