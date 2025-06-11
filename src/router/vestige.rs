@@ -1,10 +1,10 @@
 use super::apidoc::VESTIGE_TAG;
-use crate::errors::Result;
+use crate::{errors::Result, middleware::user::CompassUser};
 use apis::vestige::{
-    History, ListHistoriesReply, ListHistoriesRequest, RemoveHistoriesReply, RemoveHistoriesRequest, SaveHistoryReply, SaveHistoryRequest
+    History, ListHistoriesReply, RemoveHistoriesReply, RemoveHistoriesRequest, SaveHistoryReply, SaveHistoryRequest
 };
 use axum::{
-    extract::{Query, State}, Json
+    extract::State, Extension, Json
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 use vestige::VestigeUsecase;
@@ -22,14 +22,14 @@ pub fn router(usecase: VestigeUsecase) -> OpenApiRouter {
     get, 
     path = "", 
     responses((status = OK, body = ListHistoriesReply)), 
-    params(ListHistoriesRequest), 
+    params(("compass-user" = String, Header)), 
     tag = VESTIGE_TAG,
 )]
 async fn list_histories(
+    Extension(user): Extension<CompassUser>,
     State(uc): State<VestigeUsecase>,
-    Query(request): Query<ListHistoriesRequest>,
 ) -> Result<Json<ListHistoriesReply>> {
-    let user = request.user;
+    let user = user.0;
     let data = uc.list_histories(&user).await?;
     Ok(Json(ListHistoriesReply { data }))
 }
@@ -40,21 +40,22 @@ async fn list_histories(
     path = "", 
     responses((status = OK, body = ListHistoriesReply)), 
     request_body = SaveHistoryRequest, 
+    params(("compass-user" = String, Header)),
     tag = VESTIGE_TAG,
 )]
 async fn save_history(
+    Extension(user): Extension<CompassUser>,
     State(uc): State<VestigeUsecase>,
     Json(request): Json<SaveHistoryRequest>,
 ) -> Result<Json<SaveHistoryReply>> {
     let SaveHistoryRequest {
-        user,
         product,
         trial,
         purpose,
     } = request;
     let data = uc
         .save_history(
-            &user,
+            &user.0,
             &History {
                 id: None,
                 product,
@@ -72,6 +73,7 @@ async fn save_history(
     path = "/remove", 
     responses((status = OK, body = RemoveHistoriesReply)), 
     request_body = RemoveHistoriesRequest, 
+    params(("compass-user" = String, Header)),
     tag = VESTIGE_TAG,
 )]
 async fn remove_histories(State(uc): State<VestigeUsecase>, Json(request): Json<RemoveHistoriesRequest>) -> Result<Json<RemoveHistoriesReply>> {

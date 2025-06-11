@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use utoipa::{IntoParams, ToSchema};
+use utoipa::ToSchema;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct History {
@@ -9,11 +9,11 @@ pub struct History {
     pub purpose: String,
 }
 
-#[derive(Debug, Deserialize, IntoParams)]
-pub struct ListHistoriesRequest {
-    /// user id from aactive directory service of akeso
-    pub user: String,
-}
+// #[derive(Debug, Deserialize, IntoParams)]
+// pub struct ListHistoriesRequest {
+//     /// user id from aactive directory service of akeso
+//     pub user: String,
+// }
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ListHistoriesReply {
@@ -22,8 +22,6 @@ pub struct ListHistoriesReply {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct SaveHistoryRequest {
-    /// user id from aactive directory service of akeso
-    pub user: String,
     /// product name, for example: "ak101"
     pub product: String,
     /// trial name, for example: "101"

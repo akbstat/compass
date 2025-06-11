@@ -1,7 +1,7 @@
 mod config;
 mod errors;
+mod middleware;
 mod router;
-mod service;
 
 pub use config::Config;
 pub use errors::Result;
