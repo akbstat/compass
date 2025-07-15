@@ -1,6 +1,7 @@
 use crate::errors::Result;
 use dotenv::dotenv;
 use std::env;
+use tracing::Level;
 
 #[derive(Debug)]
 pub struct Config {
@@ -8,6 +9,7 @@ pub struct Config {
     pub database_url_vestige: String,
     pub database_url_sdtm: String,
     pub addr: String,
+    pub log_level: Level,
 }
 
 impl Config {
@@ -17,11 +19,22 @@ impl Config {
         let database_url_vestige = env::var("DATABASE_URL_VESTIGE")?;
         let database_url_sdtm = env::var("DATABASE_URL_SDTM")?;
         let log_dir = env::var("LOG_DIR")?;
+        let log_level = match env::var("LOG_LEVEL") {
+            Ok(value) => {
+                if value.eq("DEV") {
+                    Level::DEBUG
+                } else {
+                    Level::INFO
+                }
+            }
+            Err(_) => Level::INFO,
+        };
         Ok(Config {
             log_dir,
             database_url_vestige,
             database_url_sdtm,
             addr,
+            log_level,
         })
     }
 }
