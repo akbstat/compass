@@ -1,9 +1,9 @@
 use crate::{errors::Result, repository::RawdataRepository};
 use apis::sdtm::rawdata::{
     CreateFormRequest, CreateItemOptionRequest, CreateItemRequest, CreateItemTypeRequest,
-    CreateItemUnitRequest, CreateProjectRequest, CreateProjectVersionRequest, Form, Item,
-    ItemDetail, ItemOption, ItemType, ItemUnit, ListFormsRequest, ListItemsRequest,
-    ListProjectVersionRequest, Project, ProjectVersion,
+    CreateItemUnitRequest, CreateProjectRequest, CreateProjectVersionRequest, FindProjectRequest,
+    Form, Item, ItemDetail, ItemOption, ItemType, ItemUnit, ListFormsRequest, ListItemsRequest,
+    ListProjectVersionRequest, ModifyProjectVersionRequest, Project, ProjectVersion,
 };
 use sqlx::PgPool;
 use std::{collections::HashMap, sync::Arc};
@@ -44,9 +44,20 @@ impl RawdataUsecase {
         }
     }
 
+    pub async fn find_project(&self, request: &FindProjectRequest) -> Result<Option<Project>> {
+        let project_name = format!("{}-{}", request.product, request.trial);
+        let project = self.repo.find_one_project(&project_name).await?;
+        Ok(project.map(|p| p.into()))
+    }
+
     pub async fn list_forms(&self, request: &ListFormsRequest) -> Result<Vec<Form>> {
         let forms = self.repo.list_forms(request.version_id).await?;
         Ok(forms.into_iter().map(Into::into).collect())
+    }
+
+    pub async fn get_form_by_id(&self, id: i32) -> Result<Option<Form>> {
+        let form = self.repo.get_form_by_id(id).await?;
+        Ok(form.map(|f| f.into()))
     }
 
     pub async fn list_items(&self, request: &ListItemsRequest) -> Result<Vec<ItemDetail>> {
@@ -127,6 +138,15 @@ impl RawdataUsecase {
             .repo
             .create_project_version(&request.name, request.project_id)
             .await?;
+        Ok(version.into())
+    }
+
+    pub async fn modify_project_version(
+        &self,
+        id: i32,
+        request: &ModifyProjectVersionRequest,
+    ) -> Result<ProjectVersion> {
+        let version = self.repo.modify_project_version(id, &request.name).await?;
         Ok(version.into())
     }
 

@@ -5,6 +5,18 @@ pub struct CreateProjectRequest {
     pub name: String,
 }
 
+#[derive(Debug, Deserialize, IntoParams)]
+pub struct FindProjectRequest {
+    pub product: String,
+    pub trial: String,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct FindProjectReply {
+    pub data: Option<Project>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
 pub struct Project {
     pub id: i32,
     pub name: String,
@@ -19,6 +31,17 @@ pub struct CreateProjectVersionRequest {
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct CreateProjectVersionReply {
+    pub data: ProjectVersion,
+}
+
+#[derive(Debug, Deserialize, ToSchema, IntoParams)]
+#[serde(rename_all = "camelCase")]
+pub struct ModifyProjectVersionRequest {
+    pub name: String,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ModifyProjectVersionReply {
     pub data: ProjectVersion,
 }
 
@@ -73,6 +96,11 @@ pub struct ListFormsRequest {
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ListFormsReply {
     pub data: Vec<Form>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct GetFormByIdReply {
+    pub data: Option<Form>,
 }
 
 #[derive(Debug, Serialize, ToSchema, Clone)]

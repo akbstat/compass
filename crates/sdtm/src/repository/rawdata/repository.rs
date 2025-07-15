@@ -61,6 +61,21 @@ ORDER BY form_order
         Ok(rows)
     }
 
+    pub async fn get_form_by_id(&self, id: i32) -> Result<Option<FormRow>> {
+        let row = sqlx::query_as(
+            r#"
+SELECT id, version_id, name, description, form_order
+FROM form
+WHERE id = $1
+LIMIT 1
+        "#,
+        )
+        .bind(id)
+        .fetch_optional(self.pool.as_ref())
+        .await?;
+        Ok(row)
+    }
+
     pub async fn list_items(&self, form_id: i32) -> Result<Vec<ItemRow>> {
         let rows = sqlx::query_as(
             r#"
@@ -146,6 +161,20 @@ RETURNING id, project_id, name
         )
         .bind(project_id)
         .bind(name)
+        .fetch_one(self.pool.as_ref())
+        .await?;
+        Ok(row)
+    }
+
+    pub async fn modify_project_version(&self, id: i32, name: &str) -> Result<ProjectVersionRow> {
+        let row: ProjectVersionRow = sqlx::query_as(
+            r#"
+UPDATE project_version SET name = $1 WHERE id = $2
+RETURNING id, project_id, name
+        "#,
+        )
+        .bind(name)
+        .bind(id)
         .fetch_one(self.pool.as_ref())
         .await?;
         Ok(row)
