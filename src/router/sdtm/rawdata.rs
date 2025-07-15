@@ -3,11 +3,13 @@ use apis::sdtm::rawdata::{
     CreateFormReply, CreateFormRequest, CreateItemOptionReply, CreateItemOptionRequest,
     CreateItemReply, CreateItemRequest, CreateItemTypeReply, CreateItemTypeRequest,
     CreateItemUnitReply, CreateItemUnitRequest, CreateProjectVersionReply,
-    CreateProjectVersionRequest, ListFormsReply, ListFormsRequest, ListItemTypesReply,
-    ListItemsReply, ListItemsRequest, ListProjectVersionReply, ListProjectVersionRequest,
+    CreateProjectVersionRequest, FindProjectReply, FindProjectRequest, GetFormByIdReply,
+    ListFormsReply, ListFormsRequest, ListItemTypesReply, ListItemsReply, ListItemsRequest,
+    ListProjectVersionReply, ListProjectVersionRequest, ModifyProjectVersionReply,
+    ModifyProjectVersionRequest,
 };
 use axum::{
-    extract::{Query, State},
+    extract::{Path, Query, State},
     Json,
 };
 use sdtm::RawdataUsecase;
@@ -15,13 +17,19 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub fn router(usecase: RawdataUsecase) -> OpenApiRouter {
     OpenApiRouter::new()
-        .routes(routes!(list_project_versions, create_project_version))
+        .routes(routes!(
+            list_project_versions,
+            create_project_version,
+            modify_project_version
+        ))
         .routes(routes!(list_forms, create_form))
+        .routes(routes!(get_form_by_id))
         .routes(routes!(list_items, create_item))
         .routes(routes!(list_item_types, create_item_type))
         .routes(routes!(create_item_type))
         .routes(routes!(create_item_option))
         .routes(routes!(create_item_unit))
+        .routes(routes!(find_project))
         .with_state(usecase)
 }
 
@@ -53,6 +61,20 @@ async fn list_forms(
 ) -> Result<Json<ListFormsReply>> {
     let data = uc.list_forms(&request).await?;
     Ok(Json(ListFormsReply { data }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/form/{id}",
+    responses((status = OK, body = GetFormByIdReply)),
+    tag = SDTM_RAWDATA_TAG
+)]
+async fn get_form_by_id(
+    State(uc): State<RawdataUsecase>,
+    Path(id): Path<i32>,
+) -> Result<Json<GetFormByIdReply>> {
+    let data = uc.get_form_by_id(id).await?;
+    Ok(Json(GetFormByIdReply { data }))
 }
 
 #[utoipa::path(
@@ -94,6 +116,37 @@ async fn create_project_version(
 ) -> Result<Json<CreateProjectVersionReply>> {
     let data = uc.create_project_version(&request).await?;
     Ok(Json(CreateProjectVersionReply { data }))
+}
+
+#[utoipa::path(
+    put,
+    path = "/version/{id}",
+    request_body = ModifyProjectVersionRequest,
+    responses((status = OK, body = ModifyProjectVersionReply)),
+    tag = SDTM_RAWDATA_TAG
+)]
+async fn modify_project_version(
+    Path(id): Path<i32>,
+    State(uc): State<RawdataUsecase>,
+    Json(request): Json<ModifyProjectVersionRequest>,
+) -> Result<Json<ModifyProjectVersionReply>> {
+    let data = uc.modify_project_version(id, &request).await?;
+    Ok(Json(ModifyProjectVersionReply { data }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/project",
+    params(FindProjectRequest),
+    responses((status = OK, body = FindProjectReply)),
+    tag = SDTM_RAWDATA_TAG
+)]
+async fn find_project(
+    State(uc): State<RawdataUsecase>,
+    Query(request): Query<FindProjectRequest>,
+) -> Result<Json<FindProjectReply>> {
+    let data = uc.find_project(&request).await?;
+    Ok(Json(FindProjectReply { data }))
 }
 
 #[utoipa::path(

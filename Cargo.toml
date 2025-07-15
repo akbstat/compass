@@ -25,7 +25,7 @@ utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
 utoipa-axum = { version = "0.2.0", features = ["debug"] }
 sqlx = { workspace = true }
 vestige = { path = "crates/vestige" }
-sdtm = {path = "crates/sdtm"}
+sdtm = { path = "crates/sdtm" }
 
 [workspace.dependencies]
 utoipa = { version = "5.3.1", features = ["axum_extras", "debug"] }
@@ -43,3 +43,4 @@ tokio = { version = "1.44.2", features = ["full"] }
 tower-http = { version = "0.6.2", features = ["trace"] }
 tracing = "0.1.41"
 chrono = { version = "0.4.41", features = ["serde"] }
+futures = "0.3.31"

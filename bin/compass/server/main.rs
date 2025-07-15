@@ -9,7 +9,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let config = Config::new()?;
     let (logger, _guard) = non_blocking(rolling::daily(&config.log_dir, "app.log"));
     tracing_subscriber::fmt()
-        .with_max_level(Level::INFO)
+        .with_max_level(Level::DEBUG)
         .with_ansi(false)
         .with_writer(logger)
         .json()

@@ -22,7 +22,6 @@ pub fn router(usecase: VestigeUsecase) -> OpenApiRouter {
     get, 
     path = "", 
     responses((status = OK, body = ListHistoriesReply)), 
-    params(("compass-user" = String, Header)), 
     tag = VESTIGE_TAG,
 )]
 async fn list_histories(
@@ -40,7 +39,6 @@ async fn list_histories(
     path = "", 
     responses((status = OK, body = ListHistoriesReply)), 
     request_body = SaveHistoryRequest, 
-    params(("compass-user" = String, Header)),
     tag = VESTIGE_TAG,
 )]
 async fn save_history(
@@ -73,7 +71,6 @@ async fn save_history(
     path = "/remove", 
     responses((status = OK, body = RemoveHistoriesReply)), 
     request_body = RemoveHistoriesRequest, 
-    params(("compass-user" = String, Header)),
     tag = VESTIGE_TAG,
 )]
 async fn remove_histories(State(uc): State<VestigeUsecase>, Json(request): Json<RemoveHistoriesRequest>) -> Result<Json<RemoveHistoriesReply>> {

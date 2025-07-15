@@ -3,4 +3,4 @@ mod repository;
 mod usecase;
 
 pub use errors::Errors;
-pub use usecase::{MetadataUsecase, RawdataUsecase};
+pub use usecase::{AnnotationUsecase, MetadataUsecase, RawdataUsecase};
