@@ -103,6 +103,21 @@ pub struct GetFormByIdReply {
     pub data: Option<Form>,
 }
 
+#[derive(Debug, Serialize, ToSchema)]
+pub struct GetItemByIdReply {
+    pub data: Option<Item>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct GetOptionByIdReply {
+    pub data: Option<ItemOption>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct GetUnitByIdReply {
+    pub data: Option<ItemUnit>,
+}
+
 #[derive(Debug, Serialize, ToSchema, Clone)]
 pub struct ItemType {
     pub id: i32,
@@ -182,6 +197,7 @@ pub struct CreateItemReply {
 #[serde(rename_all = "camelCase")]
 pub struct ItemOption {
     pub id: i32,
+    pub item_id: i32,
     pub option_value: String,
     pub option_display: String,
     pub option_order: i32,
@@ -212,6 +228,7 @@ pub struct CreateItemUnitRequest {
 #[serde(rename_all = "camelCase")]
 pub struct ItemUnit {
     pub id: i32,
+    pub item_id: i32,
     pub name: String,
     pub unit_order: i32,
 }

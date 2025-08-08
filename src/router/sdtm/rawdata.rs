@@ -4,9 +4,9 @@ use apis::sdtm::rawdata::{
     CreateItemReply, CreateItemRequest, CreateItemTypeReply, CreateItemTypeRequest,
     CreateItemUnitReply, CreateItemUnitRequest, CreateProjectVersionReply,
     CreateProjectVersionRequest, FindProjectReply, FindProjectRequest, GetFormByIdReply,
-    ListFormsReply, ListFormsRequest, ListItemTypesReply, ListItemsReply, ListItemsRequest,
-    ListProjectVersionReply, ListProjectVersionRequest, ModifyProjectVersionReply,
-    ModifyProjectVersionRequest,
+    GetItemByIdReply, GetOptionByIdReply, GetUnitByIdReply, ListFormsReply, ListFormsRequest,
+    ListItemTypesReply, ListItemsReply, ListItemsRequest, ListProjectVersionReply,
+    ListProjectVersionRequest, ModifyProjectVersionReply, ModifyProjectVersionRequest,
 };
 use axum::{
     extract::{Path, Query, State},
@@ -25,9 +25,10 @@ pub fn router(usecase: RawdataUsecase) -> OpenApiRouter {
         .routes(routes!(list_forms, create_form))
         .routes(routes!(get_form_by_id))
         .routes(routes!(list_items, create_item))
+        .routes(routes!(get_item_by_id))
         .routes(routes!(list_item_types, create_item_type))
-        .routes(routes!(create_item_option))
-        .routes(routes!(create_item_unit))
+        .routes(routes!(create_item_option, get_option_by_id))
+        .routes(routes!(create_item_unit, get_unit_by_id))
         .routes(routes!(find_project))
         .with_state(usecase)
 }
@@ -74,6 +75,48 @@ async fn get_form_by_id(
 ) -> Result<Json<GetFormByIdReply>> {
     let data = uc.get_form_by_id(id).await?;
     Ok(Json(GetFormByIdReply { data }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/item/{id}",
+    responses((status = OK, body = GetItemByIdReply)),
+    tag = SDTM_RAWDATA_TAG
+)]
+async fn get_item_by_id(
+    State(uc): State<RawdataUsecase>,
+    Path(id): Path<i32>,
+) -> Result<Json<GetItemByIdReply>> {
+    let data = uc.get_item_by_id(id).await?;
+    Ok(Json(GetItemByIdReply { data }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/item/option/{id}",
+    responses((status = OK, body = GetOptionByIdReply)),
+    tag = SDTM_RAWDATA_TAG
+)]
+async fn get_option_by_id(
+    State(uc): State<RawdataUsecase>,
+    Path(id): Path<i32>,
+) -> Result<Json<GetOptionByIdReply>> {
+    let data = uc.get_option_by_id(id).await?;
+    Ok(Json(GetOptionByIdReply { data }))
+}
+
+#[utoipa::path(
+    get,
+    path = "/item/unit/{id}",
+    responses((status = OK, body = GetFormByIdReply)),
+    tag = SDTM_RAWDATA_TAG
+)]
+async fn get_unit_by_id(
+    State(uc): State<RawdataUsecase>,
+    Path(id): Path<i32>,
+) -> Result<Json<GetUnitByIdReply>> {
+    let data = uc.get_unit_by_id(id).await?;
+    Ok(Json(GetUnitByIdReply { data }))
 }
 
 #[utoipa::path(

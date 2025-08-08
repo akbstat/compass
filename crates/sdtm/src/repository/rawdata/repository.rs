@@ -76,6 +76,51 @@ LIMIT 1
         Ok(row)
     }
 
+    pub async fn get_item_by_id(&self, id: i32) -> Result<Option<ItemRow>> {
+        let row = sqlx::query_as(
+            r#"
+SELECT id, form_id, name, label, item_type_id, item_order, item_repeat_index, item_default_value
+FROM item
+WHERE id = $1
+LIMIT 1
+        "#,
+        )
+        .bind(id)
+        .fetch_optional(self.pool.as_ref())
+        .await?;
+        Ok(row)
+    }
+
+    pub async fn get_option_by_id(&self, id: i32) -> Result<Option<ItemOptionRow>> {
+        let row = sqlx::query_as(
+            r#"
+SELECT id, item_id, option_value, option_display, option_order
+FROM item_option
+WHERE id = $1
+LIMIT 1
+        "#,
+        )
+        .bind(id)
+        .fetch_optional(self.pool.as_ref())
+        .await?;
+        Ok(row)
+    }
+
+    pub async fn get_unit_by_id(&self, id: i32) -> Result<Option<ItemUnitRow>> {
+        let row = sqlx::query_as(
+            r#"
+SELECT id, item_id, name, unit_order
+FROM item_unit
+WHERE id = $1
+LIMIT 1
+        "#,
+        )
+        .bind(id)
+        .fetch_optional(self.pool.as_ref())
+        .await?;
+        Ok(row)
+    }
+
     pub async fn list_items(&self, form_id: i32) -> Result<Vec<ItemRow>> {
         let rows = sqlx::query_as(
             r#"

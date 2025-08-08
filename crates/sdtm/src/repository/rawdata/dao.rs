@@ -106,6 +106,7 @@ impl Into<ItemOption> for ItemOptionRow {
     fn into(self) -> ItemOption {
         ItemOption {
             id: self.id,
+            item_id: self.item_id,
             option_value: self.option_value,
             option_display: self.option_display,
             option_order: self.option_order,
@@ -126,6 +127,7 @@ impl Into<ItemUnit> for ItemUnitRow {
     fn into(self) -> ItemUnit {
         ItemUnit {
             id: self.id,
+            item_id: self.item_id,
             name: self.name,
             unit_order: self.unit_order,
         }

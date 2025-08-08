@@ -60,6 +60,21 @@ impl RawdataUsecase {
         Ok(form.map(|f| f.into()))
     }
 
+    pub async fn get_item_by_id(&self, id: i32) -> Result<Option<Item>> {
+        let item = self.repo.get_item_by_id(id).await?;
+        Ok(item.map(|i| i.into()))
+    }
+
+    pub async fn get_option_by_id(&self, id: i32) -> Result<Option<ItemOption>> {
+        let item = self.repo.get_option_by_id(id).await?;
+        Ok(item.map(|i| i.into()))
+    }
+
+    pub async fn get_unit_by_id(&self, id: i32) -> Result<Option<ItemUnit>> {
+        let item = self.repo.get_unit_by_id(id).await?;
+        Ok(item.map(|i| i.into()))
+    }
+
     pub async fn list_items(&self, request: &ListItemsRequest) -> Result<Vec<ItemDetail>> {
         let items = self.repo.list_items(request.form_id).await?;
         let item_ids = items.iter().map(|item| item.id).collect::<Vec<i32>>();
