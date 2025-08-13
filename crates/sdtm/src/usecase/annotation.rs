@@ -30,8 +30,20 @@ impl AnnotationUsecase {
         &self,
         request: &CreateAnnotationVersionRequest,
     ) -> Result<AnnotationVersion> {
-        let data = self.repo.create_annotation_version(request).await?.into();
-        Ok(data)
+        let data = self.repo.create_annotation_version(request).await?;
+        if let Some(source_version_id) = request.source_version_id {
+            let target_version_id = data.id;
+            self.repo
+                .migrate_form_domains(source_version_id, target_version_id)
+                .await?;
+            self.repo
+                .migrate_form_variables(source_version_id, target_version_id)
+                .await?;
+            self.repo
+                .migrate_annotations(source_version_id, target_version_id)
+                .await?;
+        }
+        Ok(data.into())
     }
 
     pub async fn list_annotation_versions(

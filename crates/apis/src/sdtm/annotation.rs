@@ -27,6 +27,7 @@ pub struct CreateAnnotationVersionRequest {
     pub project_version_id: i32,
     pub name: String,
     pub description: String,
+    pub source_version_id: Option<i32>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]

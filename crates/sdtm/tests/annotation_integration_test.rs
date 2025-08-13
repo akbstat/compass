@@ -37,6 +37,7 @@ async fn annotation_interation_test() -> Result<(), Box<dyn Error>> {
             project_version_id: version_id,
             name: target_annotation_version_name.to_owned(),
             description: target_annotation_version_description.to_owned(),
+            source_version_id: None,
         })
         .await?;
     let annotation_version = reply;

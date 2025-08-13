@@ -36,6 +36,74 @@ RETURNING id, project_version_id, name, description
         Ok(row)
     }
 
+    pub async fn migrate_form_domains(&self, source_version_id: i32, target_version_id: i32) -> Result<()> {
+        sqlx::query(
+            r#"
+INSERT INTO form_domain (
+        annotation_version_id,
+        form_id,
+        name,
+        description
+    )
+SELECT $1,
+    form_id,
+    name,
+    description
+FROM form_domain
+WHERE annotation_version_id = $2
+            "#).bind(target_version_id).bind(source_version_id).execute(self.pool.as_ref()).await?;
+        Ok(())
+    }
+
+    pub async fn migrate_form_variables(&self, source_version_id: i32, target_version_id: i32) -> Result<()> {
+        sqlx::query(
+            r#"
+INSERT INTO form_variable (domain_id, name, supp)
+SELECT fd_new.id,
+    fv.name,
+    fv.supp
+FROM form_variable fv
+    JOIN form_domain fd_old ON fv.domain_id = fd_old.id
+    JOIN form_domain fd_new ON fd_new.annotation_version_id = $1
+    AND fd_new.form_id = fd_old.form_id
+    AND fd_new.name = fd_old.name
+WHERE fd_old.annotation_version_id = $2
+            "#).bind(target_version_id).bind(source_version_id).execute(self.pool.as_ref()).await?;
+        Ok(())
+    }
+
+    pub async fn migrate_annotations(&self, source_version_id: i32, target_version_id: i32) -> Result<()> {
+        sqlx::query(
+            r#"
+INSERT INTO annotation (
+        annotation_version_id,
+        form_id,
+        variable_id,
+        source_id,
+        kind,
+        annotation_display,
+        assign
+    )
+SELECT $1,
+    a.form_id,
+    fv_new.id,
+    a.source_id,
+    a.kind,
+    a.annotation_display,
+    a.assign
+FROM annotation a
+    JOIN form_variable fv_old ON a.variable_id = fv_old.id
+    JOIN form_domain fd_old ON fv_old.domain_id = fd_old.id
+    JOIN form_domain fd_new ON fd_new.annotation_version_id = $1
+    AND fd_new.form_id = fd_old.form_id
+    AND fd_new.name = fd_old.name
+    JOIN form_variable fv_new ON fv_new.domain_id = fd_new.id
+    AND fv_new.name = fv_old.name
+WHERE a.annotation_version_id = $2
+        "#).bind(target_version_id).bind(source_version_id).execute(self.pool.as_ref()).await?;
+        Ok(())
+    }  
+
     pub async fn list_annotation_versions(
         &self,
         project_version_id: i32,
