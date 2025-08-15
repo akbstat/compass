@@ -101,6 +101,30 @@ FROM annotation a
     AND fv_new.name = fv_old.name
 WHERE a.annotation_version_id = $2
         "#).bind(target_version_id).bind(source_version_id).execute(self.pool.as_ref()).await?;
+
+        // migrate not summitted annotations
+        sqlx::query(
+            r#"
+INSERT INTO annotation (
+        annotation_version_id,
+        form_id,
+        variable_id,
+        source_id,
+        kind,
+        annotation_display,
+        assign
+    )
+SELECT $1,
+    a.form_id,
+    a.variable_id,
+    a.source_id,
+    a.kind,
+    a.annotation_display,
+    a.assign
+FROM annotation a
+WHERE a.annotation_version_id = $2
+AND a.variable_id = -1
+        "#).bind(target_version_id).bind(source_version_id).execute(self.pool.as_ref()).await?;
         Ok(())
     }  
 
